@@ -19,7 +19,7 @@ void __stdcall mainloop()
 				if (rvanka)
 				{
 					rvanka = false;
-					AddChat(-1, "Долетались :(");
+					AddChat(-1, "Р”РѕР»РµС‚Р°Р»РёСЃСЊ :(");
 				}
 				else
 				{
@@ -30,7 +30,7 @@ void __stdcall mainloop()
 						{
 							if (SF->getSAMP()->getPlayers()->isListed[std::stoi(id)] != 1)
 							{ 
-								AddChat(-1, "Плеер потерялся :/.");
+								AddChat(-1, "РџР»РµРµСЂ РїРѕС‚РµСЂСЏР»СЃСЏ :/.");
 							} 
 							else
 							{
@@ -55,27 +55,27 @@ void __stdcall mainloop()
 								{
 									rvanka = true;
 									pid = std::stoi(id);
-									AddChat(-1, "Ну че, полетели.");
+									AddChat(-1, "РќСѓ С‡Рµ, РїРѕР»РµС‚РµР»Рё.");
 								}
 								else
 								{
-									AddChat(-1, "Чувачок далеко чет.");
+									AddChat(-1, "Р§СѓРІР°С‡РѕРє РґР°Р»РµРєРѕ С‡РµС‚.");
 								}
 							}
 						}
 						else
 						{
-							AddChat(-1, "Введи норм ID, балбес.");
+							AddChat(-1, "Р’РІРµРґРё РЅРѕСЂРј ID, Р±Р°Р»Р±РµСЃ.");
 						}
 					}
 					else
 					{
-						AddChat(-1, "Ты не в каре -__-");
+						AddChat(-1, "РўС‹ РЅРµ РІ РєР°СЂРµ -__-");
 					}
 				}
 			});
 
-			AddChat(-1, "Рванка в$ка.");
+			AddChat(-1, "Р РІР°РЅРєР° РІ$РєР°.");
 		}
 	}
 	else
@@ -86,7 +86,7 @@ void __stdcall mainloop()
 			if (vehicle == 0)
 			{
 				rvanka = false;
-				AddChat(-1, "Ты не в каре.");
+				AddChat(-1, "РўС‹ РЅРµ РІ РєР°СЂРµ.");
 			}
 			else
 			{
@@ -116,7 +116,7 @@ void __stdcall mainloop()
 				else
 				{
 					rvanka = false;
-					AddChat(-1, "Сэбався он далеко оч.");
+					AddChat(-1, "РЎСЌР±Р°РІСЃСЏ РѕРЅ РґР°Р»РµРєРѕ РѕС‡.");
 				}
 			}
 		}
