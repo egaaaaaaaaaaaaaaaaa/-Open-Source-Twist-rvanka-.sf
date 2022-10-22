@@ -120,6 +120,52 @@ void __stdcall mainloop()
 				}
 			}
 		}
+		else
+		{
+			if (SF->getGame()->isKeyPressed(67))
+			{
+				if (twister)
+				{
+					twister = false;
+					AddChat(-1, "Норм ты блюванул.");
+				}
+				else
+				{
+					CVehicle* vehicle = PEDSELF->GetVehicle();
+					if (vehicle == 0)
+					{
+						AddChat(-1, "Ты не в каре.");
+					}
+					else
+					{
+						twister = true;
+						AddChat(-1, "Це p1zd@");
+					}
+				}
+			}
+			if (twister)
+			{
+				CVehicle* vehicle = PEDSELF->GetVehicle();
+				if (vehicle == 0)
+				{
+					twister = false;
+					AddChat(-1, "Ты не в каре.");
+				}
+				else
+				{
+					InCarData data;
+					memset(&data, 0, sizeof(InCarData));
+
+					data.quaternion[3] = 1.0f;
+
+					BitStream bs;
+					bs.Write((BYTE)ID_PLAYER_SYNC);
+					bs.Write((PCHAR)&data, sizeof(InCarData));
+					SF->getRakNet()->SendPacket(&bs);
+					printStringNow("Send Packet", 100, 1, true);
+				}
+			}
+		}
 	}
 }
 
@@ -134,19 +180,12 @@ bool __stdcall onSendPacket(stRakNetHookParams* param)
 			InCarData data = { 0 };
 			param->bitStream->Read((PCHAR)&data, sizeof(InCarData));
 
-			/* data.position[0] = pos[0];
-			data.position[1] = pos[1];
-			data.position[2] = pos[2] - 0.5f; 
-			data.moveSpeed[0] = 0;
-			data.moveSpeed[1] = 0;
-			data.moveSpeed[2] = 1.0f; */
-
 			data.position[0] = pos[0];
 			data.position[1] = pos[1];
 			data.position[2] = pos[2];
 			data.quaternion[3] = 1.0f;
-
-			printStringNow("Send Packet", 100, 1, true);
+			
+			printStringNow("Hook Packet", 160, 1, true);
 
 			param->bitStream->ResetWritePointer();
 			param->bitStream->Write<unsigned __int8>(ID_VEHICLE_SYNC);
@@ -160,6 +199,15 @@ bool __stdcall onSendPacket(stRakNetHookParams* param)
 void printStringNow(const char* text, unsigned int time, unsigned short flag, bool bPreviousBrief)
 {
 	((void(__cdecl*)(const char*, unsigned int, unsigned short, bool))0x69F1E0)(text, time, flag, bPreviousBrief);
+}
+
+bool check(const std::string& str)
+{
+	for (auto it = str.cbegin(); it != str.cend(); it++)
+		if (!isdigit(*it) && (it != str.cbegin() || *it != '-' || str.length() == 1))
+			return false;
+
+	return !str.empty();
 }
 
 float GetDistance(float lPos[3], float pPos[3]) {
