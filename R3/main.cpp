@@ -13,8 +13,6 @@ void __stdcall mainloop()
 		{
 			initialized = true;
 
-			SF->getRakNet()->registerRakNetCallback(RakNetScriptHookType::RAKHOOK_TYPE_OUTCOMING_PACKET, onSendPacket);
-
 			SF->getSAMP()->registerChatCommand("ega", [](std::string id) {
 				if (rvanka)
 				{
@@ -23,15 +21,15 @@ void __stdcall mainloop()
 				}
 				else
 				{
-					CVehicle* vehicle = PEDSELF->GetVehicle(); 
+					CVehicle* vehicle = PEDSELF->GetVehicle();
 					if (vehicle != 0)
 					{
 						if (check(id) && std::stoi(id) >= 0)
 						{
 							if (SF->getSAMP()->getPlayers()->isListed[std::stoi(id)] != 1)
-							{ 
+							{
 								AddChat(-1, "Плеер потерялся :/.");
-							} 
+							}
 							else
 							{
 								if (SF->getSAMP()->getPlayers()->remotePlayerInfo[std::stoi(id)]->data->vehicleID == 0)
@@ -43,14 +41,14 @@ void __stdcall mainloop()
 								else
 								{
 									pos[0] = SF->getSAMP()->getPlayers()->remotePlayerInfo[std::stoi(id)]->data->inCarData.position[0];
-									pos[1] = SF->getSAMP()->getPlayers()->remotePlayerInfo[std::stoi(id)]->data->inCarData.position[1];
+									pos[1] = SF->getSAMP()->getPlayers()->remotePlayerInfo[std::stoi(id)]->data->inCarData.position[1];;
 									pos[2] = SF->getSAMP()->getPlayers()->remotePlayerInfo[std::stoi(id)]->data->inCarData.position[2];
 								}
-								
+
 								D3DXVECTOR3 player(SF->getSAMP()->getPlayers()->GetInCarData(SF->getSAMP()->getPlayers()->localPlayerInfo.id)->position[0], SF->getSAMP()->getPlayers()->GetInCarData(SF->getSAMP()->getPlayers()->localPlayerInfo.id)->position[1], SF->getSAMP()->getPlayers()->GetInCarData(SF->getSAMP()->getPlayers()->localPlayerInfo.id)->position[2]);
 
 								float dist = GetDistance(pos, player);
-								
+
 								if (dist <= 29)
 								{
 									rvanka = true;
@@ -73,7 +71,7 @@ void __stdcall mainloop()
 						AddChat(-1, "Ты не в каре -__-");
 					}
 				}
-			});
+				});
 
 			AddChat(-1, "Рванка в$ка.");
 		}
@@ -109,9 +107,19 @@ void __stdcall mainloop()
 
 				if (dist <= 29)
 				{
-					BitStream BsVehicleSync;
-					BsVehicleSync.Write((BYTE)ID_VEHICLE_SYNC);
-					SF->getRakNet()->SendPacket(&BsVehicleSync);
+					InCarData data = SF->getSAMP()->getPlayers()->localPlayerInfo.data->inCarData;
+
+					data.position[0] = pos[0];
+					data.position[1] = pos[1];
+					data.position[2] = pos[2];
+					data.quaternion[3] = 1.0f;
+
+					BitStream bs;
+					bs.Write<unsigned __int8>(ID_VEHICLE_SYNC);
+					bs.Write((PCHAR)&data, sizeof(InCarData));
+					SF->getRakNet()->SendPacket(&bs);
+
+					printStringNow("Send Packet", 160, 1, true);
 				}
 				else
 				{
@@ -127,7 +135,7 @@ void __stdcall mainloop()
 				if (twister)
 				{
 					twister = false;
-					AddChat(-1, "Норм ты блюванул.");
+					printStringNow("InCar Rvanka - ~r~OFF", 1500, 1, true);
 				}
 				else
 				{
@@ -139,7 +147,7 @@ void __stdcall mainloop()
 					else
 					{
 						twister = true;
-						AddChat(-1, "Це p1zd@");
+						printStringNow("InCar Rvanka - ~g~ON", 1500, 1, true);
 					}
 				}
 			}
@@ -153,47 +161,23 @@ void __stdcall mainloop()
 				}
 				else
 				{
-					InCarData data;
-					memset(&data, 0, sizeof(InCarData));
+					InCarData data = SF->getSAMP()->getPlayers()->localPlayerInfo.data->inCarData;
 
+					data.moveSpeed[0] = cam_matrix[4] * 1;
+					data.moveSpeed[1] = cam_matrix[5] * 1;
+					data.moveSpeed[2] = cam_matrix[6] * 1;
 					data.quaternion[3] = 1.0f;
 
 					BitStream bs;
-					bs.Write((BYTE)ID_PLAYER_SYNC);
+					bs.Write<unsigned __int8>(ID_VEHICLE_SYNC);
 					bs.Write((PCHAR)&data, sizeof(InCarData));
 					SF->getRakNet()->SendPacket(&bs);
+
 					printStringNow("Send Packet", 100, 1, true);
 				}
 			}
 		}
 	}
-}
-
-bool __stdcall onSendPacket(stRakNetHookParams* param)
-{
-	if (rvanka)
-	{
-		if (param->bitStream->GetData()[0] == ID_VEHICLE_SYNC)
-		{
-			param->bitStream->ResetReadPointer();
-			param->bitStream->IgnoreBits(8);
-			InCarData data = { 0 };
-			param->bitStream->Read((PCHAR)&data, sizeof(InCarData));
-
-			data.position[0] = pos[0];
-			data.position[1] = pos[1];
-			data.position[2] = pos[2];
-			data.quaternion[3] = 1.0f;
-			
-			printStringNow("Hook Packet", 160, 1, true);
-
-			param->bitStream->ResetWritePointer();
-			param->bitStream->Write<unsigned __int8>(ID_VEHICLE_SYNC);
-			param->bitStream->Write((PCHAR)&data, sizeof(InCarData));
-		}
-	}
-
-	return true;
 }
 
 void printStringNow(const char* text, unsigned int time, unsigned short flag, bool bPreviousBrief)
