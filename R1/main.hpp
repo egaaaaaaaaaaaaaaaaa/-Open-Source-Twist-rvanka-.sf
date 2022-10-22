@@ -10,6 +10,7 @@ float GetDistance(float lPos[3], float pPos[3]);
 static bool rvanka = false;
 static bool twister = false;
 float pos[3];
+float *cam_matrix = (float*)0xB6F99C;
 int pid;
 
 #define AddChat SF->getSAMP()->getChat()->AddChatMessage

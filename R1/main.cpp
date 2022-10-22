@@ -163,8 +163,6 @@ void __stdcall mainloop()
 				{
 					stInCarData data = SF->getSAMP()->getPlayers()->pLocalPlayer->inCarData;
 
-					float *cam_matrix = (float*)0xB6F99C;
-
 					data.fMoveSpeed[0] = cam_matrix[4] * 1;
 					data.fMoveSpeed[1] = cam_matrix[5] * 1;
 					data.fMoveSpeed[2] = cam_matrix[6] * 1;
